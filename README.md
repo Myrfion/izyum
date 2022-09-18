@@ -23,6 +23,18 @@
    <li><code>izyum -i | --input [path to dir]</code> - transforms all .txt files in that directory or in it's child directories to html</li>
 </ul>
 
+<h2>Examles</h2>
+
+<h3>Test files</h3>
+
+<p>The project has test directory which has some .txt files that you could use for testing purposes</p>
+
+<h3>Usage examples</h3>
+
+<p><code>izyum -i tests</code></p>
+<p>or</p>
+<p><code>izyum --input tests/The Adventure of the Speckled Band.txt</code></p>
+
 <h2>Implemented optional features ✅</h2>
 
 <ol>
