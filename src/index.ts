@@ -4,8 +4,31 @@ const fs = require("fs")
 const path = require("path")
 const jsdom = require("jsdom")
 const pretty = require("pretty")
+const pjson = require("./../package.json")
 
-var pjson = require("./../package.json")
+function getInputFileName(args: Array<string>) {
+  return args.join(" ")
+}
+
+function getAllFiles(dirPath, arrayOfFiles = undefined) {
+  const files = fs.readdirSync(dirPath)
+
+  arrayOfFiles = arrayOfFiles || []
+
+  files.forEach(function (file) {
+    if (fs.statSync(dirPath + "/" + file).isDirectory()) {
+      arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles)
+    } else {
+      arrayOfFiles.push(path.join(dirPath, "/", file))
+    }
+  })
+
+  return arrayOfFiles
+}
+
+function filterTxtFiles(files: Array<string>): Array<string> {
+  return files.filter((file) => path.extname(file) === ".txt")
+}
 
 export type ConsoleCommands =
   | "--help"
@@ -32,10 +55,6 @@ function validateInputArguments(args: Array<string>) {
   if (args.length === 0) {
     throw new Error("Error: file/folder is not provided")
   }
-}
-
-function getInputFileName(args: Array<string>) {
-  return args.join(" ")
 }
 
 const helpMessage = `
@@ -107,17 +126,14 @@ function proccessSingleFile(filename: string) {
   proccessTextFile(filename)
 }
 
-function proccessFolder(folderName: string) {
+function proccessFolder(dirPath: string) {
   prepearDistFolder()
-  fs.readdir(folderName, (err, files) => {
-    if (err) console.log(err)
-    else {
-      files.forEach((file) => {
-        if (path.extname(file) === ".txt") {
-          proccessTextFile(`${folderName}/${file}`)
-        }
-      })
-    }
+  const files = getAllFiles(dirPath)
+  console.log(files)
+  const txtFiles = filterTxtFiles(files)
+  console.log(txtFiles)
+  txtFiles.forEach((file) => {
+    proccessTextFile(file)
   })
 }
 
