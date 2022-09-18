@@ -3,6 +3,7 @@
 const fs = require("fs")
 const path = require("path")
 const jsdom = require("jsdom")
+const pretty = require("pretty")
 
 var pjson = require("./../package.json")
 
@@ -87,7 +88,7 @@ function transformToSerializedHtml(lines: Array<string>) {
     }
   })
 
-  return dom.serialize()
+  return pretty(dom.serialize())
 }
 
 function proccessTextFile(filename: string) {
