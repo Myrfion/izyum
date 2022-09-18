@@ -27,14 +27,14 @@ const initalHtml = `<!doctype html>
 </body>
 </html>`
 
-function getInputFileName(words: Array<string>) {
-  return words.reduce((prev, cur, index) => {
-    if (index === 0) {
-      return cur
-    }
+function validateInputArguments(args: Array<string>) {
+  if (args.length === 0) {
+    throw new Error("Error: file/folder is not provided")
+  }
+}
 
-    return prev + " " + cur
-  }, "")
+function getInputFileName(args: Array<string>) {
+  return args.join(" ")
 }
 
 const helpMessage = `
@@ -120,6 +120,24 @@ function proccessFolder(folderName: string) {
   })
 }
 
+function proccessInput(args: Array<string>) {
+  try {
+    validateInputArguments(args)
+    const inputPath = getInputFileName(args)
+    if (fs.lstatSync(inputPath).isDirectory()) {
+      proccessFolder(inputPath)
+    } else if (path.extname(inputPath) === ".txt") {
+      proccessSingleFile(inputPath)
+    } else if (path.extname(inputPath) === ".txt") {
+      throw new Error("Error: Wrong file extension (has to be .txt)")
+    } else {
+      throw new Error("Error: Unkown input error")
+    }
+  } catch (error) {
+    console.error(error.message)
+  }
+}
+
 function getArgs() {
   const args = process.argv.slice(2)
   return args
@@ -143,11 +161,9 @@ switch (symbols[0] as ConsoleCommands) {
     printCommandVersion()
     break
   case "--input":
-    proccessSingleFile(getInputFileName(symbols.slice(1, symbols.length)))
-    break
   case "-i":
-    proccessFolder(getInputFileName(symbols.slice(1, symbols.length)))
+    proccessInput(symbols.slice(1, symbols.length))
     break
   default:
-    console.log("unkown command, try --help")
+    console.error("unkown command, try --help")
 }
