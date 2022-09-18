@@ -129,7 +129,7 @@ function proccessInput(args: Array<string>) {
       proccessFolder(inputPath)
     } else if (path.extname(inputPath) === ".txt") {
       proccessSingleFile(inputPath)
-    } else if (path.extname(inputPath) === ".txt") {
+    } else if (path.extname(inputPath) !== ".txt") {
       throw new Error("Error: Wrong file extension (has to be .txt)")
     } else {
       throw new Error("Error: Unkown input error")
