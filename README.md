@@ -1,4 +1,4 @@
-<h1>Izyum</h1>
+<h1>Izyum 🍇</h1>
 
 <p>Fast and nice SSG written with typescript and node.js</p>
 
@@ -14,11 +14,10 @@
 
 <p>Run <code>Izyum [options]</code></p>
 
-<h2>Implemented optional features</h2>
+<h2>Implemented optional features ✅</h2>
 
-<ul>
+<ol>
   <li>try to parse a title from your input files. If there is a title, it will be the first line followed by two blank lines. In your generated HTML, use this to populate the <code>&lt;title>...&lt;/title&gt;</code> and add an &lt;h1&gt;...&lt;/h1&gt; to the top of the <code>&lt;body></code>
   </li>
-  <li>Run <code>npm run build</code></li>
-  <li>Run <code>npm link</code></li>
-</ul>
+  <li>allow the input to be a deep tree of files and folders. That is, if the user specifies a folder for --input, check to see if any of the items contained within are folders and recursively parse those as well.</li>
+</ol>
