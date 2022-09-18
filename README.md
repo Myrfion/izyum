@@ -14,6 +14,15 @@
 
 <p>Run <code>Izyum [options]</code></p>
 
+<h2>Available commands</h2>
+
+<ul>
+  <li><code>izyum -v | --version</code> - shows currenly installed app version</li>
+  <li><code>izyum -h | --help</code> - shows help message about ways to use the app</li>
+  <li><code>izyum -i | --input [path to .txt file]</code> - transforms provided .txt file to html</li>
+   <li><code>izyum -i | --input [path to dir]</code> - transforms all .txt files in that directory or in it's child directories to html</li>
+</ul>
+
 <h2>Implemented optional features ✅</h2>
 
 <ol>
