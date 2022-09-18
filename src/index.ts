@@ -73,7 +73,7 @@ function transformToSerializedHtml(lines: Array<string>) {
   let paragraphBuffer = ""
 
   lines.forEach((line, index) => {
-    if (index === 0) {
+    if (index === 0 && lines.length > 3 && lines[1] === "" && lines[2] === "") {
       window.document.title = line
       const newH1 = window.document.createElement("h1")
       newH1.innerHTML = line
