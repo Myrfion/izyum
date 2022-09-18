@@ -129,9 +129,7 @@ function proccessSingleFile(filename: string) {
 function proccessFolder(dirPath: string) {
   prepearDistFolder()
   const files = getAllFiles(dirPath)
-  console.log(files)
   const txtFiles = filterTxtFiles(files)
-  console.log(txtFiles)
   txtFiles.forEach((file) => {
     proccessTextFile(file)
   })
