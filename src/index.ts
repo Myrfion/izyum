@@ -88,36 +88,42 @@ function prepearDistFolder() {
   fs.mkdirSync("./dist")
 }
 
-function transformToSerializedHtml(lines: Array<string>) {
+function transformToSerializedHtml(lines: Array<string>, file: string) {
   const { JSDOM } = jsdom
   const dom = new JSDOM(initalHtml)
   const { window } = dom
 
-  let paragraphBuffer = ""
-
-  lines.forEach((line, index) => {
-    if (index === 0 && lines.length > 3 && lines[1] === "" && lines[2] === "") {
-      window.document.title = line
-      const newH1 = window.document.createElement("h1")
-      newH1.innerHTML = line
-      window.document.body.appendChild(newH1)
-    } else if (line === "" && paragraphBuffer !== "") {
-      const newP = window.document.createElement("p")
-      newP.innerHTML = paragraphBuffer
-      window.document.body.appendChild(newP)
-      paragraphBuffer = ""
-    } else {
-      paragraphBuffer += line
-    }
-  })
-
+  if(path.extname(file) === ".txt"){
+    let paragraphBuffer = ""
+    lines.forEach((line, index) => {
+        if (index === 0 && lines.length > 3 && lines[1] === "" && lines[2] === "") {
+          window.document.title = line
+          const newH1 = window.document.createElement("h1")
+          newH1.innerHTML = line
+          window.document.body.appendChild(newH1)
+        } else if (line === "" && paragraphBuffer !== "") {
+          const newP = window.document.createElement("p")
+          newP.innerHTML = paragraphBuffer
+          window.document.body.appendChild(newP)
+          paragraphBuffer = ""
+        } else {
+          paragraphBuffer += line
+        }
+      })
+  } else if(path.extname(file) === ".md"){
+    lines.forEach((line) => {
+      if(line.trimStart().charAt(0) === "#"){
+        console.log("create heading 1")
+      }
+    })
+  }
   return pretty(dom.serialize())
 }
 
 function proccessTextFile(filename: string) {
   const fileContent = getFileContent(filename)
 
-  const result = transformToSerializedHtml(fileContent)
+  const result = transformToSerializedHtml(fileContent, filename)
   fs.writeFile(`./dist/${path.parse(filename).name}.html`, result, (err) => {
     if (err) {
       console.error(err)
@@ -134,8 +140,13 @@ function proccessFolder(dirPath: string) {
   prepearDistFolder()
   const files = getAllFiles(dirPath)
   const txtFiles = filterTxtFiles(files)
+  const mdFiles = filterMdFiles(files)
+
   txtFiles.forEach((file) => {
     proccessTextFile(file)
+  })
+  mdFiles.forEach((file) => {
+    // proccessTextFile(file)
   })
 }
 
@@ -148,7 +159,7 @@ function proccessInput(args: Array<string>) {
     } else if (path.extname(inputPath) === ".txt") {
       proccessSingleFile(inputPath)
     } else if (path.extname(inputPath) === ".md") {
-       // TODO
+      proccessSingleFile(inputPath)
     } else if (path.extname(inputPath) !== ".txt" && path.extname(inputPath) !== ".md") {
       throw new Error("Error: Wrong file extension (has to be .txt or .md)");
     } else {
