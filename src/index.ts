@@ -112,8 +112,11 @@ function transformToSerializedHtml(lines: Array<string>, file: string) {
       })
   } else if(path.extname(file) === ".md"){
     lines.forEach((line) => {
-      if(line.trimStart().charAt(0) === "#"){
-        console.log("create heading 1")
+      line = line.trimStart()
+      if(line.match(/^#\s+/g)){
+        const newH1 = window.document.createElement("h1")
+        newH1.innerHTML = line.substring(line.indexOf("#") + 1).trimStart()
+        window.document.body.appendChild(newH1)
       }
     })
   }
