@@ -30,6 +30,10 @@ function filterTxtFiles(files: Array<string>): Array<string> {
   return files.filter((file) => path.extname(file) === ".txt")
 }
 
+function filterMdFiles(files) {
+  return files.filter((file) => path.extname(file) === ".md");
+}
+
 export type ConsoleCommands =
   | "--help"
   | "-v"
