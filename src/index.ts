@@ -147,8 +147,6 @@ function proccessInput(args: Array<string>) {
        // TODO
     } else if (path.extname(inputPath) !== ".txt" && path.extname(inputPath) !== ".md") {
       throw new Error("Error: Wrong file extension (has to be .txt or .md)");
-    } else if (path.extname(inputPath) !== ".txt") {
-      throw new Error("Error: Wrong file extension (has to be .txt)")
     } else {
       throw new Error("Error: Unkown input error")
     }
