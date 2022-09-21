@@ -143,6 +143,10 @@ function proccessInput(args: Array<string>) {
       proccessFolder(inputPath)
     } else if (path.extname(inputPath) === ".txt") {
       proccessSingleFile(inputPath)
+    } else if (path.extname(inputPath) === ".md") {
+       // TODO
+    } else if (path.extname(inputPath) !== ".txt" && path.extname(inputPath) !== ".md") {
+      throw new Error("Error: Wrong file extension (has to be .txt or .md)");
     } else if (path.extname(inputPath) !== ".txt") {
       throw new Error("Error: Wrong file extension (has to be .txt)")
     } else {
