@@ -88,38 +88,38 @@ function prepearDistFolder() {
   fs.mkdirSync("./dist")
 }
 
-function transformToSerializedHtml(lines: Array<string>, file: string) {
+function transformToSerializedHtml(lines: Array<string>, file: String) {
   const { JSDOM } = jsdom
   const dom = new JSDOM(initalHtml)
   const { window } = dom
+  const isMdFile = path.extname(file) === ".md"
 
-  if(path.extname(file) === ".txt"){
-    let paragraphBuffer = ""
-    lines.forEach((line, index) => {
-        if (index === 0 && lines.length > 3 && lines[1] === "" && lines[2] === "") {
-          window.document.title = line
-          const newH1 = window.document.createElement("h1")
-          newH1.innerHTML = line
-          window.document.body.appendChild(newH1)
-        } else if (line === "" && paragraphBuffer !== "") {
-          const newP = window.document.createElement("p")
-          newP.innerHTML = paragraphBuffer
-          window.document.body.appendChild(newP)
-          paragraphBuffer = ""
-        } else {
-          paragraphBuffer += line
-        }
-      })
-  } else if(path.extname(file) === ".md"){
-    lines.forEach((line) => {
-      line = line.trimStart()
-      if(line.match(/^#\s+/g)){
+  let paragraphBuffer = ""
+  lines.forEach((line, index) => {
+    if (index === 0 && lines.length > 3 && lines[1] === "" && lines[2] === "") {
+      window.document.title = line
+      if (!isMdFile) {
         const newH1 = window.document.createElement("h1")
-        newH1.innerHTML = line.substring(line.indexOf("#") + 1).trimStart()
+        newH1.innerHTML = line
         window.document.body.appendChild(newH1)
       }
-    })
-  }
+    } else if (line === "" && paragraphBuffer !== "") {
+      const newP = window.document.createElement("p")
+      newP.innerHTML = paragraphBuffer
+      window.document.body.appendChild(newP)
+      paragraphBuffer = ""
+    } else if (line.match(/^#\s+/g) && isMdFile) {
+      const newH1 = window.document.createElement("h1")
+      newH1.innerHTML = line.substring(line.indexOf("#") + 1).trimStart()
+      window.document.body.appendChild(newH1)
+    } else if (line.match(/^##\s+/g) && isMdFile) {
+      const newH2 = window.document.createElement("h1")
+      newH2.innerHTML = line.substring(line.indexOf("#") + 2).trimStart()
+      window.document.body.appendChild(newH2)
+    } else {
+      paragraphBuffer += line
+    }
+  })
   return pretty(dom.serialize())
 }
 
