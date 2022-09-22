@@ -149,7 +149,7 @@ function proccessFolder(dirPath: string) {
     proccessTextFile(file)
   })
   mdFiles.forEach((file) => {
-    // proccessTextFile(file)
+    proccessTextFile(file)
   })
 }
 
