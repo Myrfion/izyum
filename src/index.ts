@@ -88,34 +88,54 @@ function prepearDistFolder() {
   fs.mkdirSync("./dist")
 }
 
-function transformToSerializedHtml(lines: Array<string>, file: String) {
+function transformMdToSerializedHtml(lines: Array<string>){
   const { JSDOM } = jsdom
   const dom = new JSDOM(initalHtml)
   const { window } = dom
-  const isMdFile = path.extname(file) === ".md"
+
+  let paragraphBuffer = ""
+  lines.forEach((line, index) => {
+    if (index === 0) {
+      window.document.title = line
+    } 
+    if (line === "" && paragraphBuffer !== "") {
+      const newP = window.document.createElement("p")
+      newP.innerHTML = paragraphBuffer
+      window.document.body.appendChild(newP)
+      paragraphBuffer = ""
+    } else if (line.match(/^#\s+/g)) {
+      const newH1 = window.document.createElement("h1")
+      newH1.innerHTML = line.substring(line.indexOf("#") + 1).trimStart()
+      window.document.body.appendChild(newH1)
+    } else if (line.match(/^##\s+/g)) {
+      const newH2 = window.document.createElement("h1")
+      newH2.innerHTML = line.substring(line.indexOf("#") + 2).trimStart()
+      window.document.body.appendChild(newH2)
+    } else {
+      paragraphBuffer += line
+    }
+  })
+
+  return pretty(dom.serialize())
+}
+
+function transformToSerializedHtml(lines: Array<string>) {
+  const { JSDOM } = jsdom
+  const dom = new JSDOM(initalHtml)
+  const { window } = dom
 
   let paragraphBuffer = ""
   lines.forEach((line, index) => {
     if (index === 0 && lines.length > 3 && lines[1] === "" && lines[2] === "") {
       window.document.title = line
-      if (!isMdFile) {
-        const newH1 = window.document.createElement("h1")
-        newH1.innerHTML = line
-        window.document.body.appendChild(newH1)
-      }
+      const newH1 = window.document.createElement("h1")
+       newH1.innerHTML = line
+       window.document.body.appendChild(newH1)
     } else if (line === "" && paragraphBuffer !== "") {
       const newP = window.document.createElement("p")
       newP.innerHTML = paragraphBuffer
       window.document.body.appendChild(newP)
       paragraphBuffer = ""
-    } else if (line.match(/^#\s+/g) && isMdFile) {
-      const newH1 = window.document.createElement("h1")
-      newH1.innerHTML = line.substring(line.indexOf("#") + 1).trimStart()
-      window.document.body.appendChild(newH1)
-    } else if (line.match(/^##\s+/g) && isMdFile) {
-      const newH2 = window.document.createElement("h1")
-      newH2.innerHTML = line.substring(line.indexOf("#") + 2).trimStart()
-      window.document.body.appendChild(newH2)
     } else {
       paragraphBuffer += line
     }
@@ -124,9 +144,15 @@ function transformToSerializedHtml(lines: Array<string>, file: String) {
 }
 
 function proccessTextFile(filename: string) {
+  let result = ""
   const fileContent = getFileContent(filename)
 
-  const result = transformToSerializedHtml(fileContent, filename)
+  if(path.extname(filename) === ".txt"){
+     result =  transformToSerializedHtml(fileContent)
+  } 
+  if(path.extname(filename) === ".md"){
+    result =  transformMdToSerializedHtml(fileContent)
+  }
   fs.writeFile(`./dist/${path.parse(filename).name}.html`, result, (err) => {
     if (err) {
       console.error(err)
