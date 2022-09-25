@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+import { join } from "path"
+import { ModuleResolutionKind } from "typescript"
+
 const fs = require("fs")
 const path = require("path")
 const jsdom = require("jsdom")
@@ -28,6 +31,10 @@ function getAllFiles(dirPath, arrayOfFiles = undefined) {
 
 function filterTxtFiles(files: Array<string>): Array<string> {
   return files.filter((file) => path.extname(file) === ".txt")
+}
+
+function filterMdFiles(files) {
+  return files.filter((file) => path.extname(file) === ".md");
 }
 
 export type ConsoleCommands =
@@ -84,13 +91,60 @@ function prepearDistFolder() {
   fs.mkdirSync("./dist")
 }
 
+function transformToStrongText(lines: string) {
+  // regular expression to find all bolded text
+  const regexForBold: RegExp = /\*{2}([\w\s\S\n\r]+?)\*{2}/gm
+  let content = lines.replace(regexForBold, `<strong>$1</strong>`)
+  return content.split('\n')
+}
+// function to process Markdown files
+function transformMdToSerializedHtml(lines: Array<string>) {
+  const { JSDOM } = jsdom
+  const dom = new JSDOM(initalHtml)
+  const { window } = dom
+  const newP = window.document.createElement("p")
+  // array to store index of elements containing H1 and H2 markers
+  let ignoredIndices = []
+  lines.forEach((line, index) => {
+    if (index === 0) {
+      window.document.title = line
+    }
+    // check if line is marked as Heading 1
+    if (line.match(/^#\s+/g)) {
+      const newH1 = window.document.createElement("h1")
+      newH1.innerHTML = line.substring(line.indexOf("#") + 1).trimStart()
+      window.document.body.appendChild(newH1)
+      ignoredIndices.push(index)
+    }
+    // check if line is marked as Heading 2
+    if (line.match(/^##\s+/g)) {
+      const newH2 = window.document.createElement("h2")
+      newH2.innerHTML = line.substring(line.indexOf("#") + 2).trimStart()
+      window.document.body.appendChild(newH2)
+      ignoredIndices.push(index)
+    }
+  })
+  // array to store lines not containing H1 and H2 
+  let filteredLines = []
+  if (lines.toString().includes("**")) {
+    // remove elements that contain H1 and H2 markers
+    filteredLines = lines.filter(function (value, index) {
+      return ignoredIndices.indexOf(index) == -1
+    })
+    let result = transformToStrongText(filteredLines.join(" "))
+    filteredLines = result
+  }
+  newP.innerHTML = filteredLines
+  window.document.body.appendChild(newP)
+  return pretty(dom.serialize())
+}
+
 function transformToSerializedHtml(lines: Array<string>) {
   const { JSDOM } = jsdom
   const dom = new JSDOM(initalHtml)
   const { window } = dom
 
   let paragraphBuffer = ""
-
   lines.forEach((line, index) => {
     if (index === 0 && lines.length > 3 && lines[1] === "" && lines[2] === "") {
       window.document.title = line
@@ -106,14 +160,19 @@ function transformToSerializedHtml(lines: Array<string>) {
       paragraphBuffer += line
     }
   })
-
   return pretty(dom.serialize())
 }
 
 function proccessTextFile(filename: string) {
+  let result = ""
   const fileContent = getFileContent(filename)
 
-  const result = transformToSerializedHtml(fileContent)
+  if (path.extname(filename) === ".txt") {
+    result = transformToSerializedHtml(fileContent)
+  }
+  if (path.extname(filename) === ".md") {
+    result = transformMdToSerializedHtml(fileContent)
+  }
   fs.writeFile(`./dist/${path.parse(filename).name}.html`, result, (err) => {
     if (err) {
       console.error(err)
@@ -130,7 +189,12 @@ function proccessFolder(dirPath: string) {
   prepearDistFolder()
   const files = getAllFiles(dirPath)
   const txtFiles = filterTxtFiles(files)
+  const mdFiles = filterMdFiles(files)
+
   txtFiles.forEach((file) => {
+    proccessTextFile(file)
+  })
+  mdFiles.forEach((file) => {
     proccessTextFile(file)
   })
 }
@@ -143,8 +207,10 @@ function proccessInput(args: Array<string>) {
       proccessFolder(inputPath)
     } else if (path.extname(inputPath) === ".txt") {
       proccessSingleFile(inputPath)
-    } else if (path.extname(inputPath) !== ".txt") {
-      throw new Error("Error: Wrong file extension (has to be .txt)")
+    } else if (path.extname(inputPath) === ".md") {
+      proccessSingleFile(inputPath)
+    } else if (path.extname(inputPath) !== ".txt" && path.extname(inputPath) !== ".md") {
+      throw new Error("Error: Wrong file extension (has to be .txt or .md)");
     } else {
       throw new Error("Error: Unkown input error")
     }
