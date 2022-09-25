@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+import { join } from "path"
+import { ModuleResolutionKind } from "typescript"
+
 const fs = require("fs")
 const path = require("path")
 const jsdom = require("jsdom")
@@ -88,34 +91,51 @@ function prepearDistFolder() {
   fs.mkdirSync("./dist")
 }
 
-function transformMdToSerializedHtml(lines: Array<string>){
+function transformToStrongText(lines: string) {
+  // regular expression to find all bolded text
+  const regexForBold: RegExp = /\*{2}([\w\s\S\n\r]+?)\*{2}/gm
+  let content = lines.replace(regexForBold, `<strong>$1</strong>`)
+  return content.split('\n')
+}
+// function to process Markdown files
+function transformMdToSerializedHtml(lines: Array<string>) {
   const { JSDOM } = jsdom
   const dom = new JSDOM(initalHtml)
   const { window } = dom
-
-  let paragraphBuffer = ""
+  const newP = window.document.createElement("p")
+  // array to store index of elements containing H1 and H2 markers
+  let ignoredIndices = []
   lines.forEach((line, index) => {
     if (index === 0) {
       window.document.title = line
-    } 
-    if (line === "" && paragraphBuffer !== "") {
-      const newP = window.document.createElement("p")
-      newP.innerHTML = paragraphBuffer
-      window.document.body.appendChild(newP)
-      paragraphBuffer = ""
-    } else if (line.match(/^#\s+/g)) {
+    }
+    // check if line is marked as Heading 1
+    if (line.match(/^#\s+/g)) {
       const newH1 = window.document.createElement("h1")
       newH1.innerHTML = line.substring(line.indexOf("#") + 1).trimStart()
       window.document.body.appendChild(newH1)
-    } else if (line.match(/^##\s+/g)) {
-      const newH2 = window.document.createElement("h1")
+      ignoredIndices.push(index)
+    }
+    // check if line is marked as Heading 2
+    if (line.match(/^##\s+/g)) {
+      const newH2 = window.document.createElement("h2")
       newH2.innerHTML = line.substring(line.indexOf("#") + 2).trimStart()
       window.document.body.appendChild(newH2)
-    } else {
-      paragraphBuffer += line
+      ignoredIndices.push(index)
     }
   })
-
+  // array to store lines not containing H1 and H2 
+  let filteredLines = []
+  if (lines.toString().includes("**")) {
+    // remove elements that contain H1 and H2 markers
+    filteredLines = lines.filter(function (value, index) {
+      return ignoredIndices.indexOf(index) == -1
+    })
+    let result = transformToStrongText(filteredLines.join(" "))
+    filteredLines = result
+  }
+  newP.innerHTML = filteredLines
+  window.document.body.appendChild(newP)
   return pretty(dom.serialize())
 }
 
@@ -129,8 +149,8 @@ function transformToSerializedHtml(lines: Array<string>) {
     if (index === 0 && lines.length > 3 && lines[1] === "" && lines[2] === "") {
       window.document.title = line
       const newH1 = window.document.createElement("h1")
-       newH1.innerHTML = line
-       window.document.body.appendChild(newH1)
+      newH1.innerHTML = line
+      window.document.body.appendChild(newH1)
     } else if (line === "" && paragraphBuffer !== "") {
       const newP = window.document.createElement("p")
       newP.innerHTML = paragraphBuffer
@@ -147,11 +167,11 @@ function proccessTextFile(filename: string) {
   let result = ""
   const fileContent = getFileContent(filename)
 
-  if(path.extname(filename) === ".txt"){
-     result =  transformToSerializedHtml(fileContent)
-  } 
-  if(path.extname(filename) === ".md"){
-    result =  transformMdToSerializedHtml(fileContent)
+  if (path.extname(filename) === ".txt") {
+    result = transformToSerializedHtml(fileContent)
+  }
+  if (path.extname(filename) === ".md") {
+    result = transformMdToSerializedHtml(fileContent)
   }
   fs.writeFile(`./dist/${path.parse(filename).name}.html`, result, (err) => {
     if (err) {
