@@ -1,8 +1,5 @@
 #!/usr/bin/env node
 
-import { join } from "path"
-import { ModuleResolutionKind } from "typescript"
-
 const fs = require("fs")
 const path = require("path")
 const jsdom = require("jsdom")
