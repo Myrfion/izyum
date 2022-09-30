@@ -43,5 +43,5 @@
   <li>allow the input to be a deep tree of files and folders. That is, if the user specifies a folder for --input, check to see if any of the items contained within are folders and recursively parse those as well.</li>
    <li>Allow the input to be a markdown file. If the user specifies a file with <code>.md</code> extension for <code>--input</code>, the tool will look for instances of lines beginning with <code># </code>, and  add those lines inside individual <code>&lt;h1>...&lt;/h1&gt;</code> tags. Similarly, if the tool detects lines beginning with <code>## </code>, then those lines will be added within individual <code>&lt;h2>...&lt;/h2&gt;</code> tags. Furthermore, text marked within a pair of <code>**</code> will be transformed 
    into bolded text. For example: <code>**Tom is a cat**</code> will be
-   converted into <code>&lt;strong&gt;Tom is a cat&lt;/strong&gt;</code>.</li>
+   converted into <code>&lt;strong&gt;Tom is a cat&lt;/strong&gt;</code>. Additionally, the line marked with 3 or more dash symbols (---) is converted to the <code>&lt;hr /></code></li>
 </ol>

@@ -120,6 +120,10 @@ function transformMdToSerializedHtml(lines: Array<string>) {
       window.document.body.appendChild(newH2)
       ignoredIndices.push(index)
     }
+    if (line.includes("---")) {
+      const newHr = window.document.createElement('hr')
+      window.document.body.appendChild(newHr)
+    }
   })
   // array to store lines not containing H1 and H2 
   let filteredLines = []
@@ -131,6 +135,7 @@ function transformMdToSerializedHtml(lines: Array<string>) {
     let result = transformToStrongText(filteredLines.join(" "))
     filteredLines = result
   }
+  
   newP.innerHTML = filteredLines
   window.document.body.appendChild(newP)
   return pretty(dom.serialize())
