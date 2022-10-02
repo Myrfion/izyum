@@ -120,6 +120,13 @@ function transformMdToSerializedHtml(lines: Array<string>) {
       window.document.body.appendChild(newH2)
       ignoredIndices.push(index)
     }
+    //check if line line has inline code
+    if (line.match(/\`(.*)\`/gim)) {
+      const newCode = window.document.createElement('p')
+      newCode.innerHTML = line.replace(/\`(.*)\`/gim, '<code>$1</code>')
+      window.document.body.appendChild(newCode)
+      ignoredIndices.push(index)
+    }
   })
   // array to store lines not containing H1 and H2 
   let filteredLines = []
