@@ -120,6 +120,7 @@ function transformMdToSerializedHtml(lines: Array<string>) {
       window.document.body.appendChild(newH2)
       ignoredIndices.push(index)
     }
+    // check if line is marked as an Horizontal line
     if (line.includes("---")) {
       const newHr = window.document.createElement('hr')
       window.document.body.appendChild(newHr)
