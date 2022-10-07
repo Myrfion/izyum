@@ -42,6 +42,8 @@ export type ConsoleCommands =
   | "--help"
   | "-i"
   | "--input"
+  | "-c"
+  | "--config"
 
 const initalHtml = `<!doctype html>
 <html lang="en">
@@ -230,6 +232,26 @@ function proccessInput(args: Array<string>) {
   }
 }
 
+function processConfig(args: Array<string>) {
+  try {
+    validateInputArguments(args)
+    const inputPath = getInputFileName(args)
+    if (!fs.lstatSync(inputPath).isDirectory() && path.extname(inputPath) == '.json') {
+      const configObject = JSON.parse(fs.readFileSync(inputPath))
+      if (!('input' in configObject)) {
+        throw new Error('Error: No "input" property in config file')
+      }
+      proccessInput([configObject['input']])
+    } else if (path.extname(inputPath) !== ".json") {
+      throw new Error("Error: Wrong config file extension (has to be .json)")
+    } else {
+      throw new Error("Error: Unkown input error")
+    }
+  } catch (error) {
+    console.error(error.message)
+  }
+}
+
 function getArgs() {
   const args = process.argv.slice(2)
   return args
@@ -255,6 +277,10 @@ switch (symbols[0] as ConsoleCommands) {
   case "--input":
   case "-i":
     proccessInput(symbols.slice(1, symbols.length))
+    break
+  case "--config":
+  case "-c":
+    processConfig(symbols.slice(1, symbols.length))
     break
   default:
     console.error("unkown command, try --help")
