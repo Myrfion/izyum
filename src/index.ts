@@ -4,11 +4,8 @@ const fs = require("fs")
 const path = require("path")
 const jsdom = require("jsdom")
 const pretty = require("pretty")
+const program = require('./program');
 const pjson = require("./../package.json")
-
-function getInputFileName(args: Array<string>) {
-  return args.join(" ")
-}
 
 function getAllFiles(dirPath, arrayOfFiles = undefined) {
   const files = fs.readdirSync(dirPath)
@@ -56,12 +53,6 @@ const initalHtml = `<!doctype html>
   <!-- Your generated content here... -->
 </body>
 </html>`
-
-function validateInputArguments(args: Array<string>) {
-  if (args.length === 0) {
-    throw new Error("Error: file/folder is not provided")
-  }
-}
 
 const helpMessage = `
   Description: The Izyum is a simple SSG that converts .txt 
@@ -212,10 +203,8 @@ function proccessFolder(dirPath: string) {
   })
 }
 
-function proccessInput(args: Array<string>) {
+function proccessInput(inputPath) {
   try {
-    validateInputArguments(args)
-    const inputPath = getInputFileName(args)
     if (fs.lstatSync(inputPath).isDirectory()) {
       proccessFolder(inputPath)
     } else if (path.extname(inputPath) === ".txt") {
@@ -232,16 +221,14 @@ function proccessInput(args: Array<string>) {
   }
 }
 
-function processConfig(args: Array<string>) {
+function processConfig(inputPath: string) {
   try {
-    validateInputArguments(args)
-    const inputPath = getInputFileName(args)
     if (!fs.lstatSync(inputPath).isDirectory() && path.extname(inputPath) == '.json') {
       const configObject = JSON.parse(fs.readFileSync(inputPath))
       if (!('input' in configObject)) {
         throw new Error('Error: No "input" property in config file')
       }
-      proccessInput([configObject['input']])
+      proccessInput(configObject['input'])
     } else if (path.extname(inputPath) !== ".json") {
       throw new Error("Error: Wrong config file extension (has to be .json)")
     } else {
@@ -252,36 +239,20 @@ function processConfig(args: Array<string>) {
   }
 }
 
-function getArgs() {
-  const args = process.argv.slice(2)
-  return args
-}
-
 function getFileContent(filename: string): Array<string> {
   const allFileContents = fs.readFileSync(filename, "utf-8")
 
   return allFileContents.split(/\r?\n/)
 }
 
-const symbols = getArgs()
+const options = program.opts();
 
-switch (symbols[0] as ConsoleCommands) {
-  case "-h":
-  case "--help":
-    printCommandHelp()
-    break
-  case "-v":
-  case "--version":
-    printCommandVersion()
-    break
-  case "--input":
-  case "-i":
-    proccessInput(symbols.slice(1, symbols.length))
-    break
-  case "--config":
-  case "-c":
-    processConfig(symbols.slice(1, symbols.length))
-    break
-  default:
-    console.error("unkown command, try --help")
+if (options.help) {
+  printCommandHelp()
+} else if (options.input) {
+  proccessInput(options.input)
+} else if (options.version) {
+  printCommandVersion()
+} else if (options.config) {
+  processConfig(options.config)
 }
