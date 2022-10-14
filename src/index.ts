@@ -4,8 +4,9 @@ const fs = require("fs")
 const path = require("path")
 const jsdom = require("jsdom")
 const pretty = require("pretty")
-const program = require('./program');
+const programCli = require('./program');
 const pjson = require("./../package.json")
+const constants = require('./contants')
 
 function getAllFiles(dirPath, arrayOfFiles = undefined) {
   const files = fs.readdirSync(dirPath)
@@ -31,42 +32,8 @@ function filterMdFiles(files) {
   return files.filter((file) => path.extname(file) === ".md");
 }
 
-export type ConsoleCommands =
-  | "--help"
-  | "-v"
-  | "--version"
-  | "-h"
-  | "--help"
-  | "-i"
-  | "--input"
-  | "-c"
-  | "--config"
-
-const initalHtml = `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Filename</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body>
-  <!-- Your generated content here... -->
-</body>
-</html>`
-
-const helpMessage = `
-  Description: The Izyum is a simple SSG that converts .txt 
-  Usage: 
-    izyum [options]
-  Options:
-    --help | -h - shows help message (eg. izyum --help)
-    --version | -v - shows the version (eg. izyum --version)
-    -input - converts provided .txt file to .html (eg. izyum --input filename.txt)
-    -i - covnerts .txt files of provided folder to .html (eg. izyum -i foldername)
-`
-
 function printCommandHelp() {
-  console.log(helpMessage)
+  console.log(constants.helpMessage)
 }
 
 function printCommandVersion() {
@@ -90,7 +57,7 @@ function transformToStrongText(lines: string) {
 // function to process Markdown files
 function transformMdToSerializedHtml(lines: Array<string>) {
   const { JSDOM } = jsdom
-  const dom = new JSDOM(initalHtml)
+  const dom = new JSDOM(constants.initalHtml)
   const { window } = dom
   const newP = window.document.createElement("p")
   // array to store index of elements containing H1 and H2 markers
@@ -145,7 +112,7 @@ function transformMdToSerializedHtml(lines: Array<string>) {
 
 function transformToSerializedHtml(lines: Array<string>) {
   const { JSDOM } = jsdom
-  const dom = new JSDOM(initalHtml)
+  const dom = new JSDOM(constants.initalHtml)
   const { window } = dom
 
   let paragraphBuffer = ""
@@ -245,7 +212,7 @@ function getFileContent(filename: string): Array<string> {
   return allFileContents.split(/\r?\n/)
 }
 
-const options = program.opts();
+const options = programCli.opts();
 
 if (options.help) {
   printCommandHelp()
