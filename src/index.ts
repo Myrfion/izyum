@@ -13,6 +13,7 @@ import {
   saveFile,
 } from './utils/files'
 import pjson from '../package.json'
+import GeneratedFile from './generated-file'
 
 function filterTxtFiles(files: Array<string>): Array<string> {
   return files.filter(file => path.extname(file) === '.txt')
@@ -33,103 +34,12 @@ function printCommandVersion() {
   `)
 }
 
-function transformToStrongText(lines: string) {
-  // regular expression to find all bolded text
-  const regexForBold: RegExp = /\*{2}([\w\s\S\n\r]+?)\*{2}/gm
-  let content = lines.replace(regexForBold, `<strong>$1</strong>`)
-  return content.split('\n')
-}
-// function to process Markdown files
-function transformMdToSerializedHtml(lines: Array<string>) {
-  const { JSDOM } = jsdom
-  const dom = new JSDOM(initalHtml)
-  const { window } = dom
-  const newP = window.document.createElement('p')
-  // array to store index of elements containing H1 and H2 markers
-  let ignoredIndices: Array<number> = []
-  lines.forEach((line, index) => {
-    if (index === 0) {
-      window.document.title = line
-    }
-    // check if line is marked as Heading 1
-    if (line.match(/^#\s+/g)) {
-      const newH1 = window.document.createElement('h1')
-      newH1.innerHTML = line.substring(line.indexOf('#') + 1).trimStart()
-      window.document.body.appendChild(newH1)
-      ignoredIndices.push(index)
-    }
-    // check if line is marked as Heading 2
-    if (line.match(/^##\s+/g)) {
-      const newH2 = window.document.createElement('h2')
-      newH2.innerHTML = line.substring(line.indexOf('#') + 2).trimStart()
-      window.document.body.appendChild(newH2)
-      ignoredIndices.push(index)
-    }
-    // check if line is marked as an Horizontal line
-    if (line.includes('---')) {
-      const newHr = window.document.createElement('hr')
-      window.document.body.appendChild(newHr)
-      ignoredIndices.push(index)
-    }
-    //check if line line has inline code
-    if (line.match(/\`(.*)\`/gim)) {
-      const newCode = window.document.createElement('p')
-      newCode.innerHTML = line.replace(/\`(.*)\`/gim, '<code>$1</code>')
-      window.document.body.appendChild(newCode)
-      ignoredIndices.push(index)
-    }
-  })
-  // array to store lines not containing H1 and H2
-  let filteredLines: Array<string> = []
-  if (lines.toString().includes('**')) {
-    // remove elements that contain H1 and H2 markers
-    filteredLines = lines.filter(function (value, index) {
-      return ignoredIndices.indexOf(index) == -1
-    })
-    let result = transformToStrongText(filteredLines.join(' '))
-    filteredLines = result
-  }
-
-  newP.innerHTML = filteredLines.join(' ')
-  window.document.body.appendChild(newP)
-  return pretty(dom.serialize())
-}
-
-function transformToSerializedHtml(lines: Array<string>) {
-  const { JSDOM } = jsdom
-  const dom = new JSDOM(initalHtml)
-  const { window } = dom
-
-  let paragraphBuffer = ''
-  lines.forEach((line, index) => {
-    if (index === 0 && lines.length > 3 && lines[1] === '' && lines[2] === '') {
-      window.document.title = line
-      const newH1 = window.document.createElement('h1')
-      newH1.innerHTML = line
-      window.document.body.appendChild(newH1)
-    } else if (line === '' && paragraphBuffer !== '') {
-      const newP = window.document.createElement('p')
-      newP.innerHTML = paragraphBuffer
-      window.document.body.appendChild(newP)
-      paragraphBuffer = ''
-    } else {
-      paragraphBuffer += line
-    }
-  })
-  return pretty(dom.serialize())
-}
-
 function proccessTextFile(filename: string) {
-  let result = ''
-  const fileContent = getFileContent(filename)
-
-  if (path.extname(filename) === '.txt') {
-    result = transformToSerializedHtml(fileContent)
+  const generatedFile = new GeneratedFile(filename)
+  let result = generatedFile.getSerializedHtml()
+  if (result) {
+    saveFile(filename, result)
   }
-  if (path.extname(filename) === '.md') {
-    result = transformMdToSerializedHtml(fileContent)
-  }
-  saveFile(filename, result)
 }
 
 function proccessSingleFile(filename: string) {

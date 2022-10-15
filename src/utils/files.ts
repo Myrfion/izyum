@@ -1,6 +1,8 @@
 import * as fs from 'fs'
 import * as path from 'path'
 
+export type SupportedFileFormats = '.txt' | '.md'
+
 export function getAllFiles(
   dirPath: string,
   arrayOfFiles: Array<string> | undefined = undefined
@@ -37,4 +39,15 @@ export function saveFile(filename: string, content: string) {
       console.error(err)
     }
   })
+}
+
+export function getFileFormat(filePath: string): SupportedFileFormats {
+  if (path.extname(filePath) === '.txt') {
+    return '.txt'
+  }
+  if (path.extname(filePath) === '.md') {
+    return '.md'
+  }
+
+  throw Error('Error: unsupported file format')
 }
