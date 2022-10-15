@@ -1,4 +1,4 @@
-export const  initalHtml = `<!doctype html>
+export const initalHtml = `<!doctype html>
   <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -8,7 +8,7 @@ export const  initalHtml = `<!doctype html>
   <body>
     <!-- Your generated content here... -->
   </body>
-      </html>` 
+      </html>`
 
 export const helpMessage = `
   Description: The Izyum is a simple SSG that converts .txt 

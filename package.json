@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "@types/pretty": "^2.0.1",
+    "prettier": "^2.7.1",
     "tslib": "^2.4.0"
   }
 }
