@@ -1,6 +1,4 @@
-
-module.exports = {
-  initalHtml: `<!doctype html>
+export const  initalHtml = `<!doctype html>
   <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -10,14 +8,14 @@ module.exports = {
   <body>
     <!-- Your generated content here... -->
   </body>
-      </html>`, 
-  helpMessage: `
-      Description: The Izyum is a simple SSG that converts .txt 
-      Usage: 
-        izyum [options]
-      Options:
-        --help | -h - shows help message (eg. izyum --help)
-        --version | -v - shows the version (eg. izyum --version)
-        -input - converts provided .txt file to .html (eg. izyum --input filename.txt)
-        -i - covnerts .txt files of provided folder to .html (eg. izyum -i foldername)`
-}
+      </html>` 
+
+export const helpMessage = `
+  Description: The Izyum is a simple SSG that converts .txt 
+  Usage: 
+    izyum [options]
+  Options:
+    --help | -h - shows help message (eg. izyum --help)
+    --version | -v - shows the version (eg. izyum --version)
+    -input - converts provided .txt file to .html (eg. izyum --input filename.txt)
+    -i - covnerts .txt files of provided folder to .html (eg. izyum -i foldername)`

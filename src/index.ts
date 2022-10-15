@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
-const fs = require("fs")
-const path = require("path")
-const jsdom = require("jsdom")
-const pretty = require("pretty")
-const programCli = require('./program');
-const pjson = require("./../package.json")
-const constants = require('./contants')
+import * as fs from 'fs'
+import * as path from 'path'
+import * as jsdom from 'jsdom'
+import pretty from "pretty"
+import { configurateProgram } from './program'
+import {initalHtml, helpMessage} from './contants'
+import pjson from '../package.json'
 
-function getAllFiles(dirPath, arrayOfFiles = undefined) {
+function getAllFiles(dirPath: string, arrayOfFiles : Array<string> | undefined = undefined) {
   const files = fs.readdirSync(dirPath)
 
   arrayOfFiles = arrayOfFiles || []
@@ -16,7 +16,7 @@ function getAllFiles(dirPath, arrayOfFiles = undefined) {
   files.forEach(function (file) {
     if (fs.statSync(dirPath + "/" + file).isDirectory()) {
       arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles)
-    } else {
+    } else if(arrayOfFiles) {
       arrayOfFiles.push(path.join(dirPath, "/", file))
     }
   })
@@ -28,12 +28,12 @@ function filterTxtFiles(files: Array<string>): Array<string> {
   return files.filter((file) => path.extname(file) === ".txt")
 }
 
-function filterMdFiles(files) {
+function filterMdFiles(files: Array<string>): Array<string> {
   return files.filter((file) => path.extname(file) === ".md");
 }
 
 function printCommandHelp() {
-  console.log(constants.helpMessage)
+  console.log(helpMessage)
 }
 
 function printCommandVersion() {
@@ -57,11 +57,11 @@ function transformToStrongText(lines: string) {
 // function to process Markdown files
 function transformMdToSerializedHtml(lines: Array<string>) {
   const { JSDOM } = jsdom
-  const dom = new JSDOM(constants.initalHtml)
+  const dom = new JSDOM(initalHtml)
   const { window } = dom
   const newP = window.document.createElement("p")
   // array to store index of elements containing H1 and H2 markers
-  let ignoredIndices = []
+  let ignoredIndices: Array<number> = []
   lines.forEach((line, index) => {
     if (index === 0) {
       window.document.title = line
@@ -95,7 +95,7 @@ function transformMdToSerializedHtml(lines: Array<string>) {
     }
   })
   // array to store lines not containing H1 and H2 
-  let filteredLines = []
+  let filteredLines : Array<string> = []
   if (lines.toString().includes("**")) {
     // remove elements that contain H1 and H2 markers
     filteredLines = lines.filter(function (value, index) {
@@ -105,14 +105,14 @@ function transformMdToSerializedHtml(lines: Array<string>) {
     filteredLines = result
   }
   
-  newP.innerHTML = filteredLines
+  newP.innerHTML = filteredLines.join(" ")
   window.document.body.appendChild(newP)
   return pretty(dom.serialize())
 }
 
 function transformToSerializedHtml(lines: Array<string>) {
   const { JSDOM } = jsdom
-  const dom = new JSDOM(constants.initalHtml)
+  const dom = new JSDOM(initalHtml)
   const { window } = dom
 
   let paragraphBuffer = ""
@@ -170,7 +170,7 @@ function proccessFolder(dirPath: string) {
   })
 }
 
-function proccessInput(inputPath) {
+function proccessInput(inputPath : string) {
   try {
     if (fs.lstatSync(inputPath).isDirectory()) {
       proccessFolder(inputPath)
@@ -183,15 +183,17 @@ function proccessInput(inputPath) {
     } else {
       throw new Error("Error: Unkown input error")
     }
-  } catch (error) {
-    console.error(error.message)
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(error.message)
+    }
   }
 }
 
 function processConfig(inputPath: string) {
   try {
     if (!fs.lstatSync(inputPath).isDirectory() && path.extname(inputPath) == '.json') {
-      const configObject = JSON.parse(fs.readFileSync(inputPath))
+      const configObject = JSON.parse(fs.readFileSync(inputPath).toString())
       if (!('input' in configObject)) {
         throw new Error('Error: No "input" property in config file')
       }
@@ -202,7 +204,9 @@ function processConfig(inputPath: string) {
       throw new Error("Error: Unkown input error")
     }
   } catch (error) {
-    console.error(error.message)
+    if (error instanceof Error) {
+      console.error(error.message)
+    }
   }
 }
 
@@ -212,7 +216,9 @@ function getFileContent(filename: string): Array<string> {
   return allFileContents.split(/\r?\n/)
 }
 
-const options = programCli.opts();
+const program = configurateProgram()
+
+const options = program.opts();
 
 if (options.help) {
   printCommandHelp()
