@@ -5,27 +5,14 @@ import * as path from 'path'
 import * as jsdom from 'jsdom'
 import pretty from 'pretty'
 import { configurateProgram } from './program'
-import { initalHtml, helpMessage } from './contants'
+import { initalHtml, helpMessage } from './utils/contants'
+import {
+  getAllFiles,
+  prepearDistFolder,
+  getFileContent,
+  saveFile,
+} from './utils/files'
 import pjson from '../package.json'
-
-function getAllFiles(
-  dirPath: string,
-  arrayOfFiles: Array<string> | undefined = undefined
-) {
-  const files = fs.readdirSync(dirPath)
-
-  arrayOfFiles = arrayOfFiles || []
-
-  files.forEach(function (file) {
-    if (fs.statSync(dirPath + '/' + file).isDirectory()) {
-      arrayOfFiles = getAllFiles(dirPath + '/' + file, arrayOfFiles)
-    } else if (arrayOfFiles) {
-      arrayOfFiles.push(path.join(dirPath, '/', file))
-    }
-  })
-
-  return arrayOfFiles
-}
 
 function filterTxtFiles(files: Array<string>): Array<string> {
   return files.filter(file => path.extname(file) === '.txt')
@@ -44,11 +31,6 @@ function printCommandVersion() {
     App Name: Izyum
     Verion: ${pjson.version}
   `)
-}
-
-function prepearDistFolder() {
-  fs.rmSync('./dist', { recursive: true, force: true })
-  fs.mkdirSync('./dist')
 }
 
 function transformToStrongText(lines: string) {
@@ -147,11 +129,7 @@ function proccessTextFile(filename: string) {
   if (path.extname(filename) === '.md') {
     result = transformMdToSerializedHtml(fileContent)
   }
-  fs.writeFile(`./dist/${path.parse(filename).name}.html`, result, err => {
-    if (err) {
-      console.error(err)
-    }
-  })
+  saveFile(filename, result)
 }
 
 function proccessSingleFile(filename: string) {
@@ -217,12 +195,6 @@ function processConfig(inputPath: string) {
       console.error(error.message)
     }
   }
-}
-
-function getFileContent(filename: string): Array<string> {
-  const allFileContents = fs.readFileSync(filename, 'utf-8')
-
-  return allFileContents.split(/\r?\n/)
 }
 
 const program = configurateProgram()
