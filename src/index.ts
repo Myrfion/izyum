@@ -2,16 +2,9 @@
 
 import * as fs from 'fs'
 import * as path from 'path'
-import * as jsdom from 'jsdom'
-import pretty from 'pretty'
 import { configurateProgram } from './program'
-import { initalHtml, helpMessage } from './utils/contants'
-import {
-  getAllFiles,
-  prepearDistFolder,
-  getFileContent,
-  saveFile,
-} from './utils/files'
+import { helpMessage } from './utils/contants'
+import { getAllFiles, prepearDistFolder, saveFile } from './utils/files'
 import pjson from '../package.json'
 import GeneratedFile from './generated-file'
 
