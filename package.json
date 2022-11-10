@@ -7,7 +7,9 @@
   "type": "commonjs",
   "scripts": {
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "npx prettier --write ./src",
+    "lint": "eslint . --ext .ts"
   },
   "repository": {
     "type": "git",
@@ -31,7 +33,10 @@
   },
   "devDependencies": {
     "@types/pretty": "^2.0.1",
-    "prettier": "^2.7.1",
+    "@typescript-eslint/eslint-plugin": "^5.42.1",
+    "@typescript-eslint/parser": "^5.42.1",
+    "eslint": "^8.27.0",
+    "prettier": "2.7.1",
     "tslib": "^2.4.0"
   }
 }

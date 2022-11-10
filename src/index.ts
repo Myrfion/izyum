@@ -29,7 +29,7 @@ function printCommandVersion() {
 
 function proccessTextFile(filename: string) {
   const generatedFile = new GeneratedFile(filename)
-  let result = generatedFile.getSerializedHtml()
+  const result = generatedFile.getSerializedHtml()
   if (result) {
     saveFile(filename, result)
   }

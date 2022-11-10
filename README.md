@@ -2,20 +2,6 @@
 
 <p>Fast and nice SSG written with typescript and node.js</p>
 
-<h2>Installation</h2>
-
-<ul>
-  <li>Run <code>npm install</code></li>
-  <li>Run <code>npm run build</code></li>
-  <li>Run <code>npm link</code></li>
-</ul>
-
-<h2>Usage</h2>
-
-<p>Run <code>Izyum [options]</code></p>
-
-<h2>Available commands</h2>
-
 <ul>
   <li><code>izyum -v | --version</code> - shows currenly installed app version</li>
   <li><code>izyum -h | --help</code> - shows help message about ways to use the app</li>
