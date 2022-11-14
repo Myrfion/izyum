@@ -1,30 +1,29 @@
 import * as jsdom from 'jsdom'
 import pretty from 'pretty'
-import {
-  getFileContent,
-  SupportedFileFormats,
-  getFileFormat,
-} from './utils/files'
+import { SupportedFileFormats } from './utils/files'
 import { initalHtml } from './utils/contants'
 import { marked } from 'marked'
-import path from 'path'
 
 class GeneratedFile {
-  filePath: string
-  content: string[]
-  fileFormat: SupportedFileFormats
+  input: string
+  format: SupportedFileFormats
+  name: string
 
-  public constructor(filePath: string) {
-    this.filePath = filePath
-    this.content = getFileContent(filePath)
-    this.fileFormat = getFileFormat(filePath)
+  public constructor(
+    input: string,
+    format: SupportedFileFormats,
+    name: string
+  ) {
+    this.input = input
+    this.format = format
+    this.name = name
   }
 
   public getSerializedHtml() {
-    if (this.fileFormat === '.txt') {
+    if (this.format === '.txt') {
       return this.getSerializedHtmlFromTxt()
     }
-    if (this.fileFormat === '.md') {
+    if (this.format === '.md') {
       return this.getSerializedHtmlFromMd()
     }
   }
@@ -33,14 +32,14 @@ class GeneratedFile {
     const { JSDOM } = jsdom
     const dom = new JSDOM(initalHtml)
     const { window } = dom
-
     let paragraphBuffer = ''
-    this.content.forEach((line, index) => {
+    const content = this.input.split(/\r?\n/)
+    content.forEach((line, index) => {
       if (
         index === 0 &&
-        this.content.length > 3 &&
-        this.content[1] === '' &&
-        this.content[2] === ''
+        content.length > 3 &&
+        content[1] === '' &&
+        content[2] === ''
       ) {
         window.document.title = line
         const newH1 = window.document.createElement('h1')
@@ -60,16 +59,14 @@ class GeneratedFile {
   }
 
   private getSerializedHtmlFromMd() {
-    const parsedHTML = marked.parse(this.content.join('\n'))
+    const parsedHTML = marked.parse(this.input)
     const { JSDOM } = jsdom
-    const dom = new JSDOM(
-      this.getWrappedHtml(parsedHTML, path.parse(this.filePath).name)
-    )
+    const dom = new JSDOM(GeneratedFile.getWrappedHtml(parsedHTML, this.name))
 
     return pretty(dom.serialize())
   }
 
-  private getWrappedHtml(parsedHtml: string, title: string) {
+  public static getWrappedHtml(parsedHtml: string, title: string) {
     return `<!doctype html>
     <html lang="en">
     <head>

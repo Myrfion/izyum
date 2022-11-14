@@ -4,7 +4,12 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { configurateProgram } from './program'
 import { helpMessage } from './utils/contants'
-import { getAllFiles, prepearDistFolder, saveFile } from './utils/files'
+import {
+  getAllFiles,
+  getFileFormat,
+  prepearDistFolder,
+  saveFile,
+} from './utils/files'
 import pjson from '../package.json'
 import GeneratedFile from './generated-file'
 
@@ -28,7 +33,13 @@ function printCommandVersion() {
 }
 
 function proccessTextFile(filename: string) {
-  const generatedFile = new GeneratedFile(filename)
+  const content = fs.readFileSync(filename, 'utf-8')
+  const fileFormat = getFileFormat(filename)
+  const generatedFile = new GeneratedFile(
+    content,
+    fileFormat,
+    path.parse(filename).name
+  )
   const result = generatedFile.getSerializedHtml()
   if (result) {
     saveFile(filename, result)

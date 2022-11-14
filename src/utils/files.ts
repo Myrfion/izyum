@@ -27,12 +27,6 @@ export function prepearDistFolder() {
   fs.mkdirSync('./dist')
 }
 
-export function getFileContent(filename: string): Array<string> {
-  const allFileContents = fs.readFileSync(filename, 'utf-8')
-
-  return allFileContents.split(/\r?\n/)
-}
-
 export function saveFile(filename: string, content: string) {
   fs.writeFile(`./dist/${path.parse(filename).name}.html`, content, err => {
     if (err) {

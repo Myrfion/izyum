@@ -21,3 +21,13 @@
 <h2>Linting</h2>
 
 <p>Project uses eslint and has the config for it use following command to run it: <code>npm run format</code> before you want to commit something</p>
+
+<h2>Testing</h2>
+
+<p>Izyum uses jest for unit testing and has following npm commands for this purposes</p>
+
+<ul>
+  <li><code>npm test</code> - runs unit tests</li>
+  <li><code>npm run test:watch</code> - runs unit tests in a watch mode</li>
+  <li><code>npm run coverage</code> - shows testing coverage</li>
+</ul>
