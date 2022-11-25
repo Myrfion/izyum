@@ -70,7 +70,7 @@ describe('Genereted file module', () => {
       'test-file'
     )
     const htmlOutput = generatedFile.getSerializedHtml()
-    expect(htmlOutput).toBe(false)
+    expect(htmlOutput).toBe(EXPECTED_HTML_OUTPUT)
   })
 
   test('txt to html conversion (with title)', () => {
