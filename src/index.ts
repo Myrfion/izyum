@@ -124,3 +124,4 @@ if (options.help) {
 } else if (options.config) {
   processConfig(options.config)
 }
+export { filterTxtFiles, filterMdFiles, printCommandHelp, printCommandVersion }
