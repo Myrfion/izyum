@@ -17,7 +17,7 @@
     "type": "git",
     "url": "git+https://github.com/Myrfion/izyum.git"
   },
-  "author": "Tymur Levtsun",
+  "author": "Tymur Levtsun <levtsuntimur@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Myrfion/izyum/issues"
