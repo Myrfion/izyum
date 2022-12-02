@@ -17,5 +17,7 @@ export const helpMessage = `
   Options:
     --help | -h - shows help message (eg. izyum --help)
     --version | -v - shows the version (eg. izyum --version)
-    -input - converts provided .txt file to .html (eg. izyum --input filename.txt)
-    -i - covnerts .txt files of provided folder to .html (eg. izyum -i foldername)`
+    -i | --input [path to .txt | .md file] - transforms provided input to html
+    -i | --input [path to dir] - transforms all .txt files in that directory or in it's child directories to html
+    -c | --config [path to .json file] - performs commands specified in json format 
+    `

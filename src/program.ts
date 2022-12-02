@@ -1,4 +1,5 @@
 import { Command } from 'commander'
+import pjson from '../package.json'
 
 export function configurateProgram() {
   const program = new Command()
@@ -6,7 +7,7 @@ export function configurateProgram() {
   program
     .name('Izyum')
     .description('The Izyum is a simple SSG that converts .txt and .md files')
-    .version('0.1.0')
+    .version(pjson.version)
 
   program
     .option(
