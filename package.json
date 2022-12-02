@@ -11,13 +11,14 @@
     "test:watch": "jest --watchAll",
     "coverage": "jest --collect-coverage",
     "format": "npx prettier --write ./src",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "version": "np --no-publish"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Myrfion/izyum.git"
   },
-  "author": "Tymur Levtsun",
+  "author": "Tymur Levtsun <levtsuntimur@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Myrfion/izyum/issues"
@@ -42,6 +43,7 @@
     "eslint": "^8.27.0",
     "install": "^0.13.0",
     "jest": "^29.3.1",
+    "np": "^7.6.2",
     "npm": "^9.1.1",
     "prettier": "2.7.1",
     "ts-jest": "^29.0.3",
