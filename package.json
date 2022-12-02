@@ -1,6 +1,6 @@
 {
   "name": "izyum",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "",
   "main": "bin/src/index.js",
   "bin": "bin/src/index.js",
@@ -11,8 +11,7 @@
     "test:watch": "jest --watchAll",
     "coverage": "jest --collect-coverage",
     "format": "npx prettier --write ./src",
-    "lint": "eslint . --ext .ts",
-    "version": "np --no-publish"
+    "lint": "eslint . --ext .ts"
   },
   "repository": {
     "type": "git",
